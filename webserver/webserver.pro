@@ -4,4 +4,10 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        main.cpp
+        locker.cpp \
+        main.cpp \
+        threadpool.cpp
+
+HEADERS += \
+    locker.h \
+    threadpool.h
