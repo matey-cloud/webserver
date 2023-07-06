@@ -57,12 +57,12 @@ bool Cond::timedwait(pthread_mutex_t *mutex, const struct timespec time)
     return pthread_cond_timedwait(&m_cond, mutex, &time);
 }
 
-bool Cond::signal() noexcept
+bool Cond::signal()
 {
     return pthread_cond_signal(&m_cond) == 0;
 }
 
-bool Cond::broadcast() noexcept
+bool Cond::broadcast()
 {
     return pthread_cond_broadcast(&m_cond) == 0;
 }

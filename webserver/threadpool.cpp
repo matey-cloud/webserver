@@ -8,6 +8,7 @@
 #include <exception>
 #include <iostream>
 
+
 template<typename T>
 ThreadPool<T>::ThreadPool(int thread_num, int max_requests)
     : m_thread_num(thread_num), m_max_requests(max_requests),
@@ -38,7 +39,7 @@ ThreadPool<T>::ThreadPool(int thread_num, int max_requests)
 }
 
 template<typename T>
-ThreadPool<T>::~threadPool()
+ThreadPool<T>::~ThreadPool()
 {
     delete []m_threads;
     m_stop = true;

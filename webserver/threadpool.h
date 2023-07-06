@@ -14,11 +14,11 @@ template<typename T>
 class ThreadPool
 {
 public:
-    ThreadPool() = delete;
+    ThreadPool() = default;
     ThreadPool(int thread_num = 8, int max_requests = 10000);
     ThreadPool(ThreadPool*) = delete;
     ThreadPool(ThreadPool&&) = delete;
-    ~threadPool();
+    ~ThreadPool();
 
     bool append(T *request);
 

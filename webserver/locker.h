@@ -13,6 +13,8 @@
 class Locker{
 public:
     Locker();
+    Locker(Locker*) = delete;
+    Locker(Locker&&) = delete;
     ~Locker();
 
     bool lock();
@@ -29,12 +31,14 @@ class Cond
 {
 public:
     Cond();
+    Cond(Cond*) = delete;
+    Cond(Cond&&) = delete;
     ~Cond();
 
     bool wait(pthread_mutex_t *mutex);
     bool timedwait(pthread_mutex_t *mutex, const timespec time);
-    bool signal() noexcept;          //随机唤醒一个线程
-    bool broadcast() noexcept;       // 唤醒所有线程
+    bool signal();          //随机唤醒一个线程
+    bool broadcast();       // 唤醒所有线程
 private:
     pthread_cond_t m_cond;
 };
@@ -45,6 +49,8 @@ class Sem{
 public:
     Sem();
     Sem(int num);
+    Sem(Sem*) = delete;
+    Sem(Sem&&) = delete;
     ~Sem();
 
     bool wait();
