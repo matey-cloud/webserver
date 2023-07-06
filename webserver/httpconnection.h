@@ -13,6 +13,10 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <sys/mman.h>
+#include <stdarg.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
 #include <iostream>
 
 class HttpConnection
@@ -80,7 +84,7 @@ private:
     bool addContent(const char *content);
     bool addContentType();
     bool addStatusLine(int status, const char *title);
-    bool addHeaders(int content_length);
+    void addHeaders(int content_length);
     bool addContentLength( int content_length );
     bool addKeepLink();
     bool addBlankLine();

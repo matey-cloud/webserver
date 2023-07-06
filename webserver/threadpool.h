@@ -14,7 +14,6 @@ template<typename T>
 class ThreadPool
 {
 public:
-    ThreadPool() = default;
     ThreadPool(int thread_num = 8, int max_requests = 10000);
     ThreadPool(ThreadPool*) = delete;
     ThreadPool(ThreadPool&&) = delete;
@@ -28,9 +27,9 @@ private:
 
 private:
     int m_thread_num;           // 线程的数量
-    pthread_t *m_threads;       // 描述线程池的数组，大小为m_thread_number
     int m_max_requests;         // 请求队列中最多允许的、等待处理的请求的数量
-    std::list<T> m_workQueue;   // 请求队列
+    pthread_t *m_threads;       // 描述线程池的数组，大小为m_thread_number
+    std::list<T*> m_workQueue;   // 请求队列
     Locker m_queueLocker;       // 保护请求队列的互斥锁
     Sem m_works;                // 是否有任务需要处理
     bool m_stop;                // 是否结束线程

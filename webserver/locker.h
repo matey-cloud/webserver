@@ -8,7 +8,7 @@
  **/
 
 #include <pthread.h>
-#include <semaphore>
+#include <semaphore.h>
 // 互斥锁类
 class Locker{
 public:

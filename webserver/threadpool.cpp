@@ -8,7 +8,6 @@
 #include <exception>
 #include <iostream>
 
-
 template<typename T>
 ThreadPool<T>::ThreadPool(int thread_num, int max_requests)
     : m_thread_num(thread_num), m_max_requests(max_requests),
@@ -25,13 +24,13 @@ ThreadPool<T>::ThreadPool(int thread_num, int max_requests)
     }
     // 创建thread_number个线程，并将他们设置为脱离线程
     for(int i = 0 ; i < m_thread_num; ++i){
-        std::cout << "create the" << i << "thread" << std::endl;
-        if(pthread_create(&m_threads[i], NULL, working, this) != 0){
+        std::cout << "create the " << i << "th thread" << std::endl;
+        if(pthread_create(m_threads+i, NULL, working, this) != 0){
             delete[] m_threads;
             throw std::exception();
         }
 
-        if(pthread_detach(&m_threads[i]) != 0){
+        if(pthread_detach(m_threads[i]) != 0){
             delete[] m_threads;
             throw std::exception();
         }
@@ -48,17 +47,16 @@ ThreadPool<T>::~ThreadPool()
 template<typename T>
 bool ThreadPool<T>::append(T *request)
 {
+    //操作工作队列时一定要加锁，因为它被所有线程共享。
     m_queueLocker.lock();
-    if(m_workQueue.size() > m_max_requests){
+    if((int)m_workQueue.size() > m_max_requests){
         m_queueLocker.unlock();
         return false;
-    } else {
-        m_workQueue.push_back(request);
-        m_queueLocker.unlock();
-        m_works.post();
-        return true;
     }
-
+    m_workQueue.push_back(request);
+    m_queueLocker.unlock();
+    m_works.post();
+    return true;
 }
 
 template<typename T>
@@ -80,10 +78,11 @@ void ThreadPool<T>::run()
             continue;
         }
         T *request = m_workQueue.front();
+        m_workQueue.pop_front();
         m_queueLocker.unlock();
         if(!request){
             continue;
         }
-
+        request->process();
     }
 }
