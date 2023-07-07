@@ -44,7 +44,7 @@ void removefd(int epoll_fd, int fd){
 // 修改文件描述符，重置socket上的EPOLLONESHOT事件，以确保下一次可读时，EPOLLIN事件能被触发
 void modifyfd(int epoll_fd, int fd, int ev){
     epoll_event event;
-    event.data,fd = fd;
+    event.data.fd = fd;
     event.events = ev | EPOLLIN | EPOLLONESHOT | EPOLLRDHUP;
     epoll_ctl(epoll_fd, EPOLL_CTL_MOD, fd, &event);
 }
@@ -153,33 +153,33 @@ HttpConnection::HTTP_CODE HttpConnection::processRead()
         std::cout << "got 1 http line: " << text << std::endl;
 
         switch (m_checked_state) {
-        case CHECK_STATE_REQUESTLINE:{
-            ret = parseRequestLine(text);
-            if(ret == BAD_REQUEST){
-                return BAD_REQUEST;
+            case CHECK_STATE_REQUESTLINE:{
+                ret = parseRequestLine(text);
+                if(ret == BAD_REQUEST){
+                    return BAD_REQUEST;
+                }
+                break;
             }
-            break;
-        }
-        case CHECK_STATE_HEADER:{
-            ret = parseRequestHead(text);
-            if(ret == BAD_REQUEST){
-                return BAD_REQUEST;
-            } else if(ret == GET_REQUEST){
-                return doRequest();
+            case CHECK_STATE_HEADER:{
+                ret = parseRequestHead(text);
+                if(ret == BAD_REQUEST){
+                    return BAD_REQUEST;
+                } else if(ret == GET_REQUEST){
+                    return doRequest();
+                }
+                break;
             }
-            break;
-        }
-        case CHECK_STATE_CONTENT:{
-            ret = parseRequestContent(text);
-            if(ret == GET_REQUEST){
-                return doRequest();
+            case CHECK_STATE_CONTENT:{
+                ret = parseRequestContent(text);
+                if(ret == GET_REQUEST){
+                    return doRequest();
+                }
+                line_status = LINE_OPEN;
+                break;
             }
-            line_status = LINE_OPEN;
-            break;
-        }
-        default:{
-            return INTERNAL_ERROR;
-        }
+            default:{
+                return INTERNAL_ERROR;
+            }
         }
     }
     return NO_REQUEST;
@@ -191,7 +191,7 @@ HttpConnection::LINE_STATUS HttpConnection::parseLine() //解析一行，判断�
     for( ; m_checked_index < m_read_index; ++m_checked_index) {//检测索引不能大于已读取缓冲区的索引
         tmp = m_read_buf[m_checked_index];
         if(tmp == '\r'){
-            if((m_checked_index+1) >= m_read_index){
+            if((m_checked_index+1) == m_read_index){
                 return LINE_OPEN;
             } else if(m_read_buf[m_checked_index + 1] == '\n'){
                 m_read_buf[m_checked_index++] = '\0'; //索引先自增，返回旧的索引值，内容赋值为字符串结束标志'\0'，
@@ -200,7 +200,7 @@ HttpConnection::LINE_STATUS HttpConnection::parseLine() //解析一行，判断�
             }
             return LINE_BAD;
         } else if (tmp == '\n'){
-            if(m_checked_index > 1 && (m_read_buf[m_checked_index - 1] == '\r')){
+            if((m_checked_index > 1) && (m_read_buf[m_checked_index - 1] == '\r')){
                 m_read_buf[m_checked_index - 1] = '\0';
                 m_read_buf[m_checked_index++] = '\0';
                 return LINE_OK;
@@ -387,7 +387,7 @@ bool HttpConnection::processWrite(HTTP_CODE ret)
     switch (ret)
     {
     case INTERNAL_ERROR:
-        addStatusLine(400, error_500_title);
+        addStatusLine(500, error_500_title);
         addHeaders(strlen(error_500_form));
         if (!addContent(error_500_form)){
             return false;
