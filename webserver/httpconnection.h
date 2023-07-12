@@ -65,6 +65,8 @@ public:
     bool read();                                       //非阻塞读
     bool write();                                      //非阻塞写
 
+    int getSocketfd(){return m_socketfd;}
+    struct sockaddr_in getSocketAddr(){return m_addr;}
 private:
     void init();                                       //初始化连接
     HTTP_CODE processRead();                           //解析HTTP请求

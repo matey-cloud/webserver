@@ -12,7 +12,7 @@ const char* error_500_title = "Internal Error";
 const char* error_500_form = "There was an unusual problem serving the requested file.\n";
 
 // 网站的根目录
-const char* doc_root = "/usr/project/webserver";
+const char* doc_root = "/usr/project/webserver/";
 
 // 所有socket上的事件都被注册到同一个epoll内核事件中，所以设置成静态的
 int HttpConnection::sm_epollfd = -1;
@@ -91,6 +91,7 @@ void HttpConnection::init(){
 
 void HttpConnection::closeConnection()
 {
+    epoll_ctl(sm_epollfd, EPOLL_CTL_DEL, m_socketfd, 0);
     if(m_socketfd != -1){
         sm_user_count--;
         m_socketfd = -1;

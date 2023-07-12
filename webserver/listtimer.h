@@ -10,17 +10,7 @@
 #include <time.h>
 #include <arpa/inet.h>
 
-const static int BUFFER_SIZE = 64;
-class util_timer;               //前向声明
-
-//用户数据结构
-struct client_data
-{
-    sockaddr_in address;        //客户端socket地址
-    int sockfd;                 //socket文件描述符
-    char buf[ BUFFER_SIZE];     //读缓存
-    util_timer* timer;          //定时器
-};
+struct client;
 
 //定时器类
 class util_timer {
@@ -29,8 +19,8 @@ public:
 
 public:
     time_t expire;   //任务超时时间，这里使用绝对时间
-    void (*cb_func)( client_data* ); //任务回调函数，回调函数处理的客户数据，由定时器的执行者传递给回调函数
-    client_data* user_data;
+    void (*cb_func)( client* ); //任务回调函数，回调函数处理的客户数据，由定时器的执行者传递给回调函数
+    client* user_data;
     util_timer* prev;    //指向前一个定时器
     util_timer* next;    //指向后一个定时器
 };
