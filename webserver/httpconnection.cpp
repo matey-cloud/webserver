@@ -12,7 +12,7 @@ const char* error_500_title = "Internal Error";
 const char* error_500_form = "There was an unusual problem serving the requested file.\n";
 
 // 网站的根目录
-const char* doc_root = "/usr/project/webserver/resources";
+const char* doc_root = "/usr/project/webserver";
 
 // 所有socket上的事件都被注册到同一个epoll内核事件中，所以设置成静态的
 int HttpConnection::sm_epollfd = -1;
@@ -128,8 +128,9 @@ bool HttpConnection::read()
         if(read_num == -1){
             if(errno == EAGAIN || errno == EWOULDBLOCK){
                 //读缓冲区没有数据
+                break;
             }
-            break;
+            return false;
         } else if(read_num ==0) {
             //对方关闭连接
             return false;
@@ -150,7 +151,7 @@ HttpConnection::HTTP_CODE HttpConnection::processRead()
         //获取一行数据
         text = getLine();
         m_start_line = m_checked_index;
-        std::cout << "got 1 http line: " << text << std::endl;
+        printf("got 1 http line: %s\n" ,text);
 
         switch (m_checked_state) {
             case CHECK_STATE_REQUESTLINE:{
@@ -281,7 +282,7 @@ HttpConnection::HTTP_CODE HttpConnection::parseRequestHead(char *text)
         text += strspn(text," \t");
         m_host = text;
     } else {
-        std::cout << "oop! unknow header: " << text << std::endl;
+        printf( "oop! unknow header: %s\n", text);
     }
     return NO_REQUEST;
 }
